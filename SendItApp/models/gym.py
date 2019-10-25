@@ -1,0 +1,26 @@
+from django.db import models
+from .climber import Climber
+
+class Gym(models.Model):
+    """
+    Creates table for Gyms
+    Author: Curt Cato
+    methods: none
+    """
+    gym_name = models.CharField(max_length=50)
+    street_address = models.CharField(max_length=50)
+    city = models.CharField(max_length=25)
+    state = models.CharField(max_length=25)
+    longitude = models.CharField(max_length=50)
+    latitude = models.CharField(max_length=50)
+    url = models.CharField(max_length=50)
+    wall_height = models.CharField(max_length=20)
+    gym_size = models.CharField(max_length=20)
+    climber = models.ForeignKey(Climber, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = ("gym")
+        verbose_name_plural = ("gyms")
+
+    def __str__(self):
+        return self.gym_name
