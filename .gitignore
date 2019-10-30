@@ -52,9 +52,13 @@ media/
 *.db
 *.pid
 
+key.py
+
 # django migrations
 migrations
 
 #db location
 views/connection.py
 SendItEnv
+
+

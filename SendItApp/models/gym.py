@@ -9,10 +9,8 @@ class Gym(models.Model):
     """
     gym_name = models.CharField(max_length=50)
     street_address = models.CharField(max_length=50)
-    city = models.CharField(max_length=25)
-    state = models.CharField(max_length=25)
-    longitude = models.CharField(max_length=50)
-    latitude = models.CharField(max_length=50)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6)
     url = models.CharField(max_length=50)
     wall_height = models.CharField(max_length=20)
     gym_size = models.CharField(max_length=20)
