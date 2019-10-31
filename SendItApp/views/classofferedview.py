@@ -20,8 +20,8 @@ class ClassOfferedSerializer(serializers.HyperlinkedModelSerializer):
             view_name='classoffered',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'class_name', 'description', 'days_offered', 'time_offered', 'gym')
-        depth = 1
+        fields = ('id', 'url', 'class_name', 'description', 'days_offered', 'time_offered', 'gym', 'gym_id')
+        depth = 2
 
 
 class ClassesOffered(ViewSet):
@@ -39,11 +39,11 @@ class ClassesOffered(ViewSet):
         """
 
         new_class = ClassOffered()
-        new_class_gym = Gym.objects.get(user=request.auth.user)
-        new_class_name = request.data["class_name"]
-        new_class_description = request.data["description"]
-        new_class_days_offered = request.data["days_offered"]
-        new_class_time_offered = request.data["time_offered"]
+        new_class.gym = Gym.objects.get(pk=request.data['gym_id'])
+        new_class.class_name = request.data["class_name"]
+        new_class.description = request.data["description"]
+        new_class.days_offered = request.data["days_offered"]
+        new_class.time_offered = request.data["time_offered"]
         # new_class is ready to save now
         new_class.save()
         # Convert the class to json and send it back to the client
@@ -78,13 +78,13 @@ class ClassesOffered(ViewSet):
         Returns:
             Response -- Empty body with 204 status code
         """
-        update_class_offered = ClassOffered.objects.get(pk=pk)
-        update_class_name = request.data["class_name"]
-        update_class_description = request.data["description"]
-        update_class_days_offered = request.data["days_offered"]
-        update_class_time_offered = request.data["time_offered"]
+        updated_class = ClassOffered.objects.get(pk=pk)
+        updated_class.class_name = request.data["class_name"]
+        updated_class.description = request.data["description"]
+        updated_class.days_offered = request.data["days_offered"]
+        updated_class.time_offered = request.data["time_offered"]
 
-        update_class_offered.save()
+        updated_class.save()
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
@@ -120,6 +120,11 @@ class ClassesOffered(ViewSet):
             Response -- JSON serialized list of orders
         """
         classes_offered = ClassOffered.objects.all()
+
+        gym = self.request.query_params.get('gym_id', None)
+
+        if gym is not None:
+            classes_offered = classes_offered.filter(gym_id=gym)
 
         serializer = ClassOfferedSerializer(
             classes_offered, many=True, context={'request': request}
