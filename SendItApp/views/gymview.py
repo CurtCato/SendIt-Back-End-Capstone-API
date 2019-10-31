@@ -24,8 +24,8 @@ class GymSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field='id'
         )
 
-        fields = ('id', 'gym_name', 'street_address', 'longitude', 'latitude', 'climber', 'gym_size', 'wall_height', 'url')
-        depth = 1
+        fields = ('id', 'climber_id', 'gym_name', 'street_address', 'longitude', 'latitude', 'climber', 'gym_size', 'wall_height', 'url')
+        depth = 3
 
 
 class Gyms(ViewSet):
@@ -71,10 +71,10 @@ class Gyms(ViewSet):
         updated_gym = Gym.objects.get(pk=pk)
         updated_gym.gym_name = request.data["gym_name"]
         updated_gym.street_address = request.data["street_address"]
-        updated_gym.state = request.data["state"]
-        updated_gym.city = request.data["city"]
-        updated_gym.longitude = request.data["longitude"]
-        updated_gym.latitude = request.data["latitude"]
+        gmaps = googlemaps.Client(key=GoogleToken)
+        geocode_result = gmaps.geocode(request.data['street_address'])[0]
+        updated_gym.latitude = geocode_result['geometry']['location']['lat']
+        updated_gym.longitude = geocode_result['geometry']['location']['lng']
         updated_gym.gym_size = request.data["gym_size"]
         updated_gym.wall_height = request.data["wall_height"]
         updated_gym.save()
