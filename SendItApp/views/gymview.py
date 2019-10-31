@@ -6,6 +6,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from SendItApp.models import *
 from django.contrib.auth.models import User
+from key import GoogleToken
+import googlemaps
 
 
 class GymSerializer(serializers.HyperlinkedModelSerializer):
@@ -22,9 +24,8 @@ class GymSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field='id'
         )
 
-        fields = ('id', 'gym_name', 'street_address', 'city',
-          'state', 'longitude', 'latitude', 'climber', 'gym_size', 'wall_height' 'url')
-        depth = 1
+        fields = ('id', 'climber_id', 'gym_name', 'street_address', 'longitude', 'latitude', 'climber', 'gym_size', 'wall_height', 'url')
+        depth = 3
 
 
 class Gyms(ViewSet):
@@ -32,16 +33,18 @@ class Gyms(ViewSet):
         Returns:
             Response -- JSON serialized gym instance
         """
+
+
     permission_classes = (IsAuthenticatedOrReadOnly,)
     def create(self, request):
         new_gym = Gym()
         new_gym.climber = Climber.objects.get(user=request.auth.user)
         new_gym.gym_name = request.data["gym_name"]
         new_gym.street_address = request.data["street_address"]
-        new_gym.state = request.data["state"]
-        new_gym.city = request.data["city"]
-        new_gym.longitude = request.data["longitude"]
-        new_gym.latitude = request.data["latitude"]
+        gmaps = googlemaps.Client(key=GoogleToken)
+        geocode_result = gmaps.geocode(request.data['street_address'])[0]
+        new_gym.latitude = geocode_result['geometry']['location']['lat']
+        new_gym.longitude = geocode_result['geometry']['location']['lng']
         new_gym.gym_size = request.data["gym_size"]
         new_gym.wall_height = request.data["wall_height"]
         new_gym.save()
@@ -68,10 +71,10 @@ class Gyms(ViewSet):
         updated_gym = Gym.objects.get(pk=pk)
         updated_gym.gym_name = request.data["gym_name"]
         updated_gym.street_address = request.data["street_address"]
-        updated_gym.state = request.data["state"]
-        updated_gym.city = request.data["city"]
-        updated_gym.longitude = request.data["longitude"]
-        updated_gym.latitude = request.data["latitude"]
+        gmaps = googlemaps.Client(key=GoogleToken)
+        geocode_result = gmaps.geocode(request.data['street_address'])[0]
+        updated_gym.latitude = geocode_result['geometry']['location']['lat']
+        updated_gym.longitude = geocode_result['geometry']['location']['lng']
         updated_gym.gym_size = request.data["gym_size"]
         updated_gym.wall_height = request.data["wall_height"]
         updated_gym.save()
