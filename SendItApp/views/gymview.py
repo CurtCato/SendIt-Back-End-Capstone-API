@@ -10,6 +10,38 @@ from django.contrib.auth.models import User
 from key import GoogleToken
 import googlemaps
 
+class ClimbingSerializer(serializers.HyperlinkedModelSerializer):
+    """JSON serializer for gyms
+
+        Arguments:
+        serializers.HyperlinkedModelSerializer
+    """
+    # This meta defines the field and the model that is being used
+    class Meta:
+        model = ClimbingType
+        url = serializers.HyperlinkedIdentityField(
+        view_name='climbingType',
+        lookup_field='id'
+        )
+
+        fields = ('id', 'type_name')
+
+class GymTypeSerializer(serializers.HyperlinkedModelSerializer):
+    """JSON serializer for gyms
+
+        Arguments:
+        serializers.HyperlinkedModelSerializer
+    """
+    # This meta defines the field and the model that is being used
+    climbing_type=ClimbingSerializer(many=False)
+    class Meta:
+        model = GymType
+        url = serializers.HyperlinkedIdentityField(
+        view_name='gymType',
+        lookup_field='id'
+        )
+
+        fields = ('id', 'climbing_type')
 
 class GymSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for gyms
@@ -18,6 +50,7 @@ class GymSerializer(serializers.HyperlinkedModelSerializer):
         serializers.HyperlinkedModelSerializer
     """
     # This meta defines the field and the model that is being used
+    matching_types=GymTypeSerializer(many=True)
     class Meta:
         model = Gym
         url = serializers.HyperlinkedIdentityField(
@@ -25,8 +58,10 @@ class GymSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field='id'
         )
 
-        fields = ('id', 'climber_id', 'gym_name', 'street_address', 'longitude', 'latitude', 'climber', 'gym_size', 'wall_height', 'url')
-        depth = 3
+        fields = ('id', 'matching_types', 'climber_id', 'gym_name', 'street_address', 'longitude', 'latitude', 'climber', 'gym_size', 'wall_height', 'url')
+        depth = 1
+
+
 
 
 class Gyms(ViewSet):
