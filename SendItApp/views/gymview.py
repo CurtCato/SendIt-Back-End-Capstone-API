@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.decorators import action
 from SendItApp.models import *
 from django.contrib.auth.models import User
 from key import GoogleToken
@@ -48,6 +49,16 @@ class Gyms(ViewSet):
         new_gym.gym_size = request.data["gym_size"]
         new_gym.wall_height = request.data["wall_height"]
         new_gym.save()
+
+
+        selectedTypes = request.data["selectedCLimbingTypes"]
+        for climbTypeId in selectedTypes:
+            climbType = GymType()
+            climbType.gym = new_gym
+            climbType.climbing_type = ClimbingType.objects.get(pk=int(climbTypeId))
+            climbType.save()
+
+
         serializer = GymSerializer(new_gym, context={'request': request})
         return Response(serializer.data)
 
@@ -104,7 +115,17 @@ class Gyms(ViewSet):
             Response -- JSON serialized list of gyms
         """
         gyms = Gym.objects.all()  # This is my query to the database
+        climber = Climber.objects.get(user=request.auth.user)
 
+        serializer = GymSerializer(
+            gyms, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def usergyms(self, request):
+        climber = Climber.objects.get(user=request.auth.user)
+        gyms = Gym.objects.all()
+        gyms= gyms.filter(climber=climber)
         serializer = GymSerializer(
             gyms, many=True, context={'request': request})
         return Response(serializer.data)
