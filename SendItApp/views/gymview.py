@@ -83,6 +83,7 @@ class Gyms(ViewSet):
         new_gym.longitude = geocode_result['geometry']['location']['lng']
         new_gym.gym_size = request.data["gym_size"]
         new_gym.wall_height = request.data["wall_height"]
+        new_gym.url = request.data["url"]
         new_gym.save()
 
 
@@ -123,6 +124,7 @@ class Gyms(ViewSet):
         updated_gym.longitude = geocode_result['geometry']['location']['lng']
         updated_gym.gym_size = request.data["gym_size"]
         updated_gym.wall_height = request.data["wall_height"]
+        updated_gym.url = request.data["url"]
         updated_gym.save()
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
