@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from key import GoogleToken
 import googlemaps
 
-class ClimbingSerializer(serializers.HyperlinkedModelSerializer):
+class ClimbingTypeSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for gyms
 
         Arguments:
@@ -33,7 +33,7 @@ class GymTypeSerializer(serializers.HyperlinkedModelSerializer):
         serializers.HyperlinkedModelSerializer
     """
     # This meta defines the field and the model that is being used
-    climbing_type=ClimbingSerializer(many=False)
+    climbing_type=ClimbingTypeSerializer(many=False)
     class Meta:
         model = GymType
         url = serializers.HyperlinkedIdentityField(
@@ -164,3 +164,37 @@ class Gyms(ViewSet):
         serializer = GymSerializer(
             gyms, many=True, context={'request': request})
         return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def getAutoBelays(self, request):
+        gyms=Gym.objects.all()
+        gyms=Gym.objects.filter(matching_types__climbing_type__id=1)
+        serializer = GymSerializer(
+            gyms, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def getTopRopes(self, request):
+        gyms=Gym.objects.all()
+        gyms=Gym.objects.filter(matching_types__climbing_type__id=2)
+        serializer = GymSerializer(
+            gyms, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def getLead(self, request):
+        gyms=Gym.objects.all()
+        gyms=Gym.objects.filter(matching_types__climbing_type__id=3)
+        serializer = GymSerializer(
+            gyms, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def getBoulders(self, request):
+        gyms=Gym.objects.all()
+        gyms=Gym.objects.filter(matching_types__climbing_type__id=4)
+        serializer = GymSerializer(
+            gyms, many=True, context={'request': request})
+        return Response(serializer.data)
+
+
