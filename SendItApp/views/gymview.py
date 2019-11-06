@@ -4,11 +4,44 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.decorators import action
 from SendItApp.models import *
 from django.contrib.auth.models import User
 from key import GoogleToken
 import googlemaps
 
+class ClimbingTypeSerializer(serializers.HyperlinkedModelSerializer):
+    """JSON serializer for gyms
+
+        Arguments:
+        serializers.HyperlinkedModelSerializer
+    """
+    # This meta defines the field and the model that is being used
+    class Meta:
+        model = ClimbingType
+        url = serializers.HyperlinkedIdentityField(
+        view_name='climbingType',
+        lookup_field='id'
+        )
+
+        fields = ('id', 'type_name')
+
+class GymTypeSerializer(serializers.HyperlinkedModelSerializer):
+    """JSON serializer for gyms
+
+        Arguments:
+        serializers.HyperlinkedModelSerializer
+    """
+    # This meta defines the field and the model that is being used
+    climbing_type=ClimbingTypeSerializer(many=False)
+    class Meta:
+        model = GymType
+        url = serializers.HyperlinkedIdentityField(
+        view_name='gymType',
+        lookup_field='id'
+        )
+
+        fields = ('id', 'climbing_type')
 
 class GymSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for gyms
@@ -17,6 +50,7 @@ class GymSerializer(serializers.HyperlinkedModelSerializer):
         serializers.HyperlinkedModelSerializer
     """
     # This meta defines the field and the model that is being used
+    matching_types=GymTypeSerializer(many=True)
     class Meta:
         model = Gym
         url = serializers.HyperlinkedIdentityField(
@@ -24,8 +58,10 @@ class GymSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field='id'
         )
 
-        fields = ('id', 'climber_id', 'gym_name', 'street_address', 'longitude', 'latitude', 'climber', 'gym_size', 'wall_height', 'url')
-        depth = 3
+        fields = ('id', 'matching_types', 'climber_id', 'gym_name', 'street_address', 'longitude', 'latitude', 'climber', 'gym_size', 'wall_height', 'url')
+        depth = 1
+
+
 
 
 class Gyms(ViewSet):
@@ -48,6 +84,16 @@ class Gyms(ViewSet):
         new_gym.gym_size = request.data["gym_size"]
         new_gym.wall_height = request.data["wall_height"]
         new_gym.save()
+
+
+        selectedTypes = request.data["selectedCLimbingTypes"]
+        for climbTypeId in selectedTypes:
+            climbType = GymType()
+            climbType.gym = new_gym
+            climbType.climbing_type = ClimbingType.objects.get(pk=int(climbTypeId))
+            climbType.save()
+
+
         serializer = GymSerializer(new_gym, context={'request': request})
         return Response(serializer.data)
 
@@ -104,7 +150,51 @@ class Gyms(ViewSet):
             Response -- JSON serialized list of gyms
         """
         gyms = Gym.objects.all()  # This is my query to the database
+        climber = Climber.objects.get(user=request.auth.user)
 
         serializer = GymSerializer(
             gyms, many=True, context={'request': request})
         return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def usergyms(self, request):
+        climber = Climber.objects.get(user=request.auth.user)
+        gyms = Gym.objects.all()
+        gyms= gyms.filter(climber=climber)
+        serializer = GymSerializer(
+            gyms, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def getAutoBelays(self, request):
+        gyms=Gym.objects.all()
+        gyms=Gym.objects.filter(matching_types__climbing_type__id=1)
+        serializer = GymSerializer(
+            gyms, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def getTopRopes(self, request):
+        gyms=Gym.objects.all()
+        gyms=Gym.objects.filter(matching_types__climbing_type__id=2)
+        serializer = GymSerializer(
+            gyms, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def getLead(self, request):
+        gyms=Gym.objects.all()
+        gyms=Gym.objects.filter(matching_types__climbing_type__id=3)
+        serializer = GymSerializer(
+            gyms, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def getBoulders(self, request):
+        gyms=Gym.objects.all()
+        gyms=Gym.objects.filter(matching_types__climbing_type__id=4)
+        serializer = GymSerializer(
+            gyms, many=True, context={'request': request})
+        return Response(serializer.data)
+
+
