@@ -1,5 +1,7 @@
 from django.db import models
 from .climber import Climber
+from .climbingtype import ClimbingType
+
 
 class Gym(models.Model):
     """

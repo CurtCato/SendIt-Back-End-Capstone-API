@@ -10,5 +10,7 @@ class GymType(models.Model):
     methods: none
     """
 
-    gym = models.ForeignKey(Gym, on_delete=models.CASCADE)
+    gym = models.ForeignKey(Gym, on_delete=models.CASCADE, related_name="matching_types")
     climbing_type = models.ForeignKey(ClimbingType, on_delete=models.CASCADE)
+
+
