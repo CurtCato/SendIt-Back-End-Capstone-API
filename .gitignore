@@ -52,7 +52,6 @@ media/
 *.db
 *.pid
 
-# key.py
 
 # django migrations
 migrations
