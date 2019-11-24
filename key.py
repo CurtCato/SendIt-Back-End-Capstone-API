@@ -1,0 +1,5 @@
+GoogleToken = 'AIzaSyDPnEXyFoqXG4XFg7XM-q8q1IA3dmcEdVg'
+
+MapboxPublicToken = 'pk.eyJ1IjoiY3VydGNhdG8iLCJhIjoiY2syNm96N3A5MDh5ODNtb2p4OXFmMHZhYyJ9.0D76nINjKYmKDJr4iyFydQ'
+
+MapboxSendItToken = 'pk.eyJ1IjoiY3VydGNhdG8iLCJhIjoiY2syNnBqNG5sMDYzNDNtcGVndDRicG9ieCJ9.bvtZbY967kdaq4vKBf-sug'
