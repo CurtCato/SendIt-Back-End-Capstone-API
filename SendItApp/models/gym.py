@@ -1,14 +1,9 @@
 from django.db import models
 from .climber import Climber
-from .climbingtype import ClimbingType
-
 
 class Gym(models.Model):
-    """
-    Creates table for Gyms
-    Author: Curt Cato
-    methods: none
-    """
+
+
     gym_name = models.CharField(max_length=50)
     street_address = models.CharField(max_length=50)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
