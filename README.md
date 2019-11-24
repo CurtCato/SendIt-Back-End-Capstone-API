@@ -6,7 +6,7 @@ There are a couple steps to run this server. After you clone the repo, cd into i
 In the root project directory run the command: python manage.py makemigrations SendItApp
 Next run: python manage.py migrate
 
-Run this command: python -m venv SendItAPI
+Run this command: python -m venv SendItEnv
 Next, in cmd cd into the SendItEnv directory within the project directory
 Then cd into the Scripts directory and run the command: Start activate.bat
 In the root directory run the command: pip install django autopep8 pylint djangorestframework django-cors-headers pylint-django mapbox googlemaps
